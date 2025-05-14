@@ -25,6 +25,7 @@
 *.swp
 *.swo
 *~
+*.txt
 
 # Directorios de compilación comunes
 /build/

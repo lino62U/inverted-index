@@ -63,6 +63,19 @@ public:
         for (const auto& term : terms) {
             term_doc_map[term].push_back(doc_id);
         }
+
+        // Imprimir el term_doc_map
+        std::cout << "Term -> Documents:\n";
+        for (const auto& entry : term_doc_map) {
+            const std::string& term = entry.first;
+            const std::vector<uint32_t>& doc_list = entry.second;
+            
+            std::cout << "Term: " << term << " -> Docs: ";
+            for (uint32_t doc : doc_list) {
+                std::cout << doc << " ";
+            }
+            std::cout << std::endl;
+        }
         
         for (const auto& entry : term_doc_map) {
             const std::string& term = entry.first;
