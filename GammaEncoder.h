@@ -7,33 +7,73 @@
 
 class GammaEncoder {
 public:
-    static std::string encode_number(uint32_t num) {
-        if (num == 0) throw std::invalid_argument("gamma encoding undefined for 0");
-
-        uint32_t n = log2(num);
-        std::string unary(n, '1');
-        unary += '0';
-
-        std::bitset<32> binary(num);
-        std::string offset = binary.to_string().substr(32 - n);
-
-        return unary + offset;
-    }
-
-    static std::string encode_list(const std::vector<uint32_t>& numbers) {
-        std::string bits;
-        for (auto n : numbers) {
-            bits += encode_number(n);
+    static std::string encode(const std::vector<uint32_t>& numbers) {
+        if (numbers.empty()) return "";
+        
+        std::string result;
+        uint32_t prev = 0;
+        
+        for (uint32_t num : numbers) {
+            uint32_t diff = num - prev;
+            prev = num;
+            
+            if (diff == 0) continue; // No debería ocurrir con doc IDs únicos
+            
+            // Codificar gamma de la diferencia
+            diff++; // Porque gamma no puede codificar 0
+            
+            std::string binary = std::bitset<32>(diff).to_string();
+            size_t first_one = binary.find('1');
+            if (first_one == std::string::npos) {
+                continue; // No debería ocurrir
+            }
+            
+            binary = binary.substr(first_one);
+            std::string unary = std::string(binary.length() - 1, '0') + '1';
+            std::string offset = binary.substr(1);
+            
+            result += unary + offset;
         }
-        return bits;
+        
+        return result;
     }
-
-    static std::vector<uint8_t> to_bytes(const std::string& bitstring) {
-        std::vector<uint8_t> bytes;
-        for (size_t i = 0; i < bitstring.size(); i += 8) {
-            std::bitset<8> b(bitstring.substr(i, std::min(8UL, bitstring.size() - i)));
-            bytes.push_back(static_cast<uint8_t>(b.to_ulong()));
+    
+    static std::vector<uint32_t> decode(const std::string& str) {
+        std::vector<uint32_t> result;
+        if (str.empty()) return result;
+        
+        size_t pos = 0;
+        uint32_t prev = 0;
+        
+        while (pos < str.length()) {
+            // Leer parte unaria (longitud)
+            size_t len = 0;
+            while (pos < str.length() && str[pos] == '0') {
+                len++;
+                pos++;
+            }
+            
+            if (pos >= str.length() || str[pos] != '1') {
+                break; // Error
+            }
+            
+            pos++; // Saltar el '1'
+            
+            // Leer parte offset (bits restantes)
+            if (pos + len > str.length()) {
+                break; // Error
+            }
+            
+            std::string offset = "1" + str.substr(pos, len);
+            pos += len;
+            
+            uint32_t diff = std::bitset<32>(offset).to_ulong();
+            diff--; // Deshacer el +1 de la codificación
+            
+            prev += diff;
+            result.push_back(prev);
         }
-        return bytes;
+        
+        return result;
     }
 };

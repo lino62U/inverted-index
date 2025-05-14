@@ -1,0 +1,54 @@
+# Ignorar ejecutables en Linux, macOS y Windows
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Archivos intermedios de compilación
+*.o
+*.obj
+*.a
+*.lib
+*.lo
+
+# Archivos de depuración y perfilado
+*.gch
+*.pch
+*.dSYM/
+*.stackdump
+
+# Archivos generados por herramientas de desarrollo
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+
+# Directorios de compilación comunes
+/build/
+/bin/
+/dist/
+/Debug/
+/Release/
+
+# Archivos de CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Archivos de Visual Studio (opcional)
+*.vcxproj*
+*.sln
+*.user
+*.ncb
+*.aps
+*.sdf
+*.opensdf
+*.vcxproj.filters
+
+# Archivos de configuración de IDEs (opcional)
+.idea/
+.vscode/
